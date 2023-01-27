@@ -1,8 +1,10 @@
+mod camera;
 mod hit;
 mod ray;
 mod sphere;
 mod vec3;
 mod world;
+pub use camera::Camera;
 pub use hit::*;
 pub use ray::Ray;
 pub use sphere::*;
