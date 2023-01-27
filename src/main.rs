@@ -1,9 +1,11 @@
+use rand::Rng;
 use ray_tracing_in_one_weekend::{Camera, Color, Hit, Point3, Ray, Sphere, World};
 use std::io::{stderr, Write};
 
 const ASPECT_RATIO: f64 = 16.0 / 9.0;
 const IMAGE_WIDTH: u64 = 256;
-const IMAGE_HEIGHT: u64 = ((256 as f64) / ASPECT_RATIO) as u64;
+const IMAGE_HEIGHT: u64 = ((IMAGE_WIDTH as f64) / ASPECT_RATIO) as u64;
+const SAMPLES_PER_PIXEL: u64 = 100;
 
 fn ray_color(r: &Ray, world: &World) -> Color {
     if let Some(rec) = world.hit(r, 0.0, f64::INFINITY) {
@@ -22,16 +24,24 @@ fn main() {
     println!("{} {}", IMAGE_WIDTH, IMAGE_HEIGHT);
     println!("255");
 
+    let mut rng = rand::thread_rng();
     for j in (0..IMAGE_HEIGHT).rev() {
         eprint!("\rScanlines remaining: {:3}", j);
         stderr().flush().unwrap();
         for i in 0..IMAGE_WIDTH {
-            let u = (i as f64) / ((IMAGE_WIDTH - 1) as f64);
-            let v = (j as f64) / ((IMAGE_HEIGHT - 1) as f64);
-            let r = camera.get_ray(u, v);
+            let mut pixel_color = Color::new(0.0, 0.0, 0.0);
+            for _ in 0..SAMPLES_PER_PIXEL {
+                let random_u: f64 = rng.gen();
+                let random_v: f64 = rng.gen();
 
-            let pixel_color = ray_color(&r, &scene);
-            println!("{}", pixel_color.format_color());
+                let u = ((i as f64) + random_u) / ((IMAGE_WIDTH - 1) as f64);
+                let v = ((j as f64) + random_v) / ((IMAGE_HEIGHT - 1) as f64);
+
+                let r = camera.get_ray(u, v);
+                pixel_color += ray_color(&r, &scene);
+            }
+
+            println!("{}", pixel_color.format_color(SAMPLES_PER_PIXEL));
         }
     }
     eprintln!("\nDone.");
