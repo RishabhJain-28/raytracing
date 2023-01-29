@@ -1,6 +1,11 @@
 use rand::Rng;
-use ray_tracing_in_one_weekend::{Camera, Color, Hit, Point3, Ray, Sphere, Vec3, World};
-use std::io::{stderr, Write};
+use ray_tracing_in_one_weekend::{
+    Camera, Color, Hit, Lambertian, Metal, Point3, Ray, Sphere, Vec3, World,
+};
+use std::{
+    io::{stderr, Write},
+    rc::Rc,
+};
 
 const ASPECT_RATIO: f64 = 16.0 / 9.0;
 const IMAGE_WIDTH: u64 = 256;
@@ -12,11 +17,13 @@ fn ray_color(r: &Ray, world: &World, depth: u64) -> Color {
     if depth <= 0 {
         return Color::new(0.0, 0.0, 0.0);
     }
+
     if let Some(rec) = world.hit(r, 0.001, f64::INFINITY) {
-        // let target = rec.p + Vec3::random_in_hemisphere(rec.normal);
-        let target = rec.p + rec.normal + Vec3::random_in_unit_sphere().normalized();
-        let r = Ray::new(rec.p, target - rec.p);
-        0.5 * ray_color(&r, world, depth - 1)
+        if let Some((attenuation, scattered)) = rec.mat.scatter(r, &rec) {
+            attenuation * ray_color(&scattered, world, depth - 1)
+        } else {
+            Color::new(0.0, 0.0, 0.0)
+        }
     } else {
         let unit_direction = r.direction().normalized();
         let t = 0.5 * (unit_direction.y() + 1.0);
@@ -55,9 +62,21 @@ fn main() {
 }
 
 fn create_scene() -> World {
+    let mat_ground = Rc::new(Lambertian::new(Color::new(0.8, 0.8, 0.0)));
+    let mat_center = Rc::new(Lambertian::new(Color::new(0.7, 0.3, 0.3)));
+    let mat_left = Rc::new(Metal::new(Color::new(0.8, 0.8, 0.8), 0.3));
+    let mat_right = Rc::new(Metal::new(Color::new(0.8, 0.6, 0.2), 1.0));
+
+    let sphere_ground = Sphere::new(Point3::new(0.0, -100.5, -1.0), 100.0, mat_ground);
+    let sphere_center = Sphere::new(Point3::new(0.0, 0.0, -1.0), 0.5, mat_center);
+    let sphere_left = Sphere::new(Point3::new(-1.0, 0.0, -1.0), 0.5, mat_left);
+    let sphere_right = Sphere::new(Point3::new(1.0, 0.0, -1.0), 0.5, mat_right);
+
     let mut world = World::new();
-    world.push(Box::new(Sphere::new(Point3::new(0.0, 0.0, -1.0), 0.5)));
-    world.push(Box::new(Sphere::new(Point3::new(0.0, -100.5, -1.0), 100.0)));
+    world.push(Box::new(sphere_ground));
+    world.push(Box::new(sphere_center));
+    world.push(Box::new(sphere_left));
+    world.push(Box::new(sphere_right));
 
     world
 }

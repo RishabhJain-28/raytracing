@@ -7,6 +7,7 @@ mod vec3;
 mod world;
 pub use camera::Camera;
 pub use hit::*;
+pub use material::*;
 pub use ray::Ray;
 pub use sphere::*;
 pub use vec3::{Color, Point3, Vec3};
