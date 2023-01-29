@@ -1,5 +1,6 @@
 mod camera;
 mod hit;
+mod material;
 mod ray;
 mod sphere;
 mod vec3;
