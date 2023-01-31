@@ -5,7 +5,7 @@ mod ray;
 mod sphere;
 mod vec3;
 mod world;
-pub use camera::Camera;
+pub use camera::{Camera, CameraConfig};
 pub use hit::*;
 pub use material::*;
 pub use ray::Ray;
