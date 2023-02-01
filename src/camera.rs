@@ -1,25 +1,4 @@
-use crate::{Point3, Ray, Vec3};
-
-pub struct CameraConfig {
-    lookfrom: Point3,
-    lookat: Point3,
-    vup: Vec3,
-    dist_to_focus: f64,
-    aperture: f64,
-    vfov: f64,
-}
-impl CameraConfig {
-    pub fn new(lookfrom: Point3, lookat: Point3, vup: Vec3, aperture: f64, vfov: f64) -> Self {
-        Self {
-            lookfrom,
-            lookat,
-            vup,
-            dist_to_focus: (lookfrom - lookat).length(),
-            aperture,
-            vfov,
-        }
-    }
-}
+use crate::{CameraConfig, Point3, Ray, Vec3};
 
 pub struct Camera {
     origin: Point3,
