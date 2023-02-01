@@ -2,7 +2,7 @@
 
 This is an implementation of [Peter Shirley's Ray Tracing in One Weekend](https://raytracing.github.io/books/RayTracingInOneWeekend.html) in Rust.
 
-## Preview of the final image converted to JPEG
+## Preview of the final image converted to PNG
 
 ## To recreate the output image run:
 
