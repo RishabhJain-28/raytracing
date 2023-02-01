@@ -7,7 +7,7 @@ pub fn get_random_spheres_scene() -> Scene {
     eprintln!("Random spheres scene!");
     let camera_config = CameraConfig::new(CameraConfigOptions {
         lookfrom: Point3::new(13.0, 2.0, 3.0),
-        lookat: Point3::new(13.0, 2.0, 3.0),
+        lookat: Point3::new(0.0, 0.0, 0.0),
         vup: Vec3::new(0.0, 1.0, 0.0),
         aperture: 0.1,
         vfov: 20.0,

@@ -1,7 +1,7 @@
 use rand::Rng;
 use ray_tracing_in_one_weekend::{
-    base_scene, Camera, CameraConfig, Color, Config, Dielectric, Hit, Lambertian, Metal, Point3,
-    Ray, Scene, Sphere, Vec3, World,
+    base_scene, get_random_spheres_scene, Camera, CameraConfig, Color, Config, Dielectric, Hit,
+    Lambertian, Metal, Point3, Ray, Scene, Sphere, Vec3, World,
 };
 use rayon::prelude::{IntoParallelIterator, ParallelIterator};
 use std::{
@@ -81,7 +81,7 @@ fn dev_scene() -> Scene {
 }
 
 fn main() {
-    let (config, world, camera) = base_scene();
+    let (config, world, camera) = get_random_spheres_scene();
 
     println!("P3");
     println!("{} {}", config.image_width, config.image_height);
