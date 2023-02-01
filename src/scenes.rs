@@ -1,8 +1,6 @@
-use std::rc::Rc;
-
-use rand::Rng;
-
 use crate::*;
+use rand::Rng;
+use std::sync::Arc;
 pub type Scene = (Config, World, Camera);
 
 pub fn get_random_spheres_scene() -> Scene {
@@ -27,7 +25,7 @@ pub fn get_random_spheres_scene() -> Scene {
     let mut rng = rand::thread_rng();
     let mut world = World::new();
 
-    let ground_mat = Rc::new(Lambertian::new(Color::new(0.5, 0.5, 0.5)));
+    let ground_mat = Arc::new(Lambertian::new(Color::new(0.5, 0.5, 0.5)));
     let ground_sphere = Sphere::new(Point3::new(0.0, -1000.0, 0.0), 1000.0, ground_mat);
 
     world.push(Box::new(ground_sphere));
@@ -44,7 +42,7 @@ pub fn get_random_spheres_scene() -> Scene {
             if choose_mat < 0.8 {
                 // Diffuse
                 let albedo = Color::random(0.0..1.0) * Color::random(0.0..1.0);
-                let sphere_mat = Rc::new(Lambertian::new(albedo));
+                let sphere_mat = Arc::new(Lambertian::new(albedo));
                 let sphere = Sphere::new(center, 0.2, sphere_mat);
 
                 world.push(Box::new(sphere));
@@ -52,13 +50,13 @@ pub fn get_random_spheres_scene() -> Scene {
                 // Metal
                 let albedo = Color::random(0.4..1.0);
                 let fuzz = rng.gen_range(0.0..0.5);
-                let sphere_mat = Rc::new(Metal::new(albedo, fuzz));
+                let sphere_mat = Arc::new(Metal::new(albedo, fuzz));
                 let sphere = Sphere::new(center, 0.2, sphere_mat);
 
                 world.push(Box::new(sphere));
             } else {
                 // Glass
-                let sphere_mat = Rc::new(Dielectric::new(1.5));
+                let sphere_mat = Arc::new(Dielectric::new(1.5));
                 let sphere = Sphere::new(center, 0.2, sphere_mat);
 
                 world.push(Box::new(sphere));
@@ -66,9 +64,9 @@ pub fn get_random_spheres_scene() -> Scene {
         }
     }
 
-    let mat1 = Rc::new(Dielectric::new(1.5));
-    let mat2 = Rc::new(Lambertian::new(Color::new(0.4, 0.2, 0.1)));
-    let mat3 = Rc::new(Metal::new(Color::new(0.7, 0.6, 0.5), 0.0));
+    let mat1 = Arc::new(Dielectric::new(1.5));
+    let mat2 = Arc::new(Lambertian::new(Color::new(0.4, 0.2, 0.1)));
+    let mat3 = Arc::new(Metal::new(Color::new(0.7, 0.6, 0.5), 0.0));
 
     let sphere1 = Sphere::new(Point3::new(0.0, 1.0, 0.0), 1.0, mat1);
     let sphere2 = Sphere::new(Point3::new(-4.0, 1.0, 0.0), 1.0, mat2);
@@ -102,10 +100,10 @@ pub fn base_scene() -> Scene {
     });
     let camera = Camera::new(&config.camera_config, config.aspect_ratio);
     let mut world = World::new();
-    let mat_ground = Rc::new(Lambertian::new(Color::new(0.8, 0.8, 0.0)));
-    let mat_center = Rc::new(Lambertian::new(Color::new(0.1, 0.2, 0.5)));
-    let mat_left = Rc::new(Dielectric::new(1.5));
-    let mat_right = Rc::new(Metal::new(Color::new(0.8, 0.6, 0.2), 0.0));
+    let mat_ground = Arc::new(Lambertian::new(Color::new(0.8, 0.8, 0.0)));
+    let mat_center = Arc::new(Lambertian::new(Color::new(0.1, 0.2, 0.5)));
+    let mat_left = Arc::new(Dielectric::new(1.5));
+    let mat_right = Arc::new(Metal::new(Color::new(0.8, 0.6, 0.2), 0.0));
 
     let sphere_ground = Sphere::new(Point3::new(0.0, -100.5, -1.0), 100.0, mat_ground);
     let sphere_center = Sphere::new(Point3::new(0.0, 0.0, -1.0), 0.5, mat_center);
