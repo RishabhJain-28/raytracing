@@ -37,6 +37,8 @@ pub struct CameraConfigOptions {
     pub aperture: f64,
     pub vfov: f64,
     pub dist_to_focus: Option<f64>,
+    pub time0: Option<f64>,
+    pub time1: Option<f64>,
 }
 pub struct CameraConfig {
     pub lookfrom: Point3,
@@ -45,13 +47,14 @@ pub struct CameraConfig {
     pub dist_to_focus: f64,
     pub aperture: f64,
     pub vfov: f64,
+    pub time0: f64,
+    pub time1: f64,
 }
 impl CameraConfig {
     pub fn new(config: CameraConfigOptions) -> Self {
         let dist_to_focus = config
             .dist_to_focus
             .unwrap_or_else(|| (config.lookfrom - config.lookat).length());
-
         Self {
             lookfrom: config.lookfrom,
             dist_to_focus,
@@ -59,6 +62,8 @@ impl CameraConfig {
             vup: config.vup,
             aperture: config.aperture,
             vfov: config.vfov,
+            time0: config.time0.unwrap_or_default(),
+            time1: config.time0.unwrap_or_default(),
         }
     }
 }

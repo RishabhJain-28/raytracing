@@ -3,6 +3,7 @@ use rand::Rng;
 use std::sync::Arc;
 pub type Scene = (Config, World, Camera);
 
+#[allow(dead_code)]
 pub fn get_random_spheres_scene() -> Scene {
     eprintln!("Random spheres scene!");
     let camera_config = CameraConfig::new(CameraConfigOptions {
@@ -12,6 +13,8 @@ pub fn get_random_spheres_scene() -> Scene {
         aperture: 0.1,
         vfov: 20.0,
         dist_to_focus: Some(10.0),
+        time0: Some(0.0),
+        time1: Some(1.0),
     });
 
     let config = Config::new(ConfigOptions {
@@ -80,6 +83,10 @@ pub fn get_random_spheres_scene() -> Scene {
 
     return (config, world, camera);
 }
+
+#[allow(dead_code)]
+
+// add motion
 pub fn base_scene() -> Scene {
     eprintln!("Base Scene!");
     let camera_config = CameraConfig::new(CameraConfigOptions {
@@ -89,6 +96,50 @@ pub fn base_scene() -> Scene {
         aperture: 0.0,
         vfov: 90.0,
         dist_to_focus: None,
+        time0: None,
+        time1: None,
+    });
+
+    let config = Config::new(ConfigOptions {
+        aspect_ratio: 16.0 / 9.0,
+        image_width: 256,
+        samples_per_pixel: 100,
+        max_depth: 5,
+        camera_config,
+    });
+    let camera = Camera::new(&config.camera_config, config.aspect_ratio);
+    let mut world = World::new();
+    let mat_ground = Arc::new(Lambertian::new(Color::new(0.8, 0.8, 0.0)));
+    let mat_center = Arc::new(Lambertian::new(Color::new(0.1, 0.2, 0.5)));
+    let mat_left = Arc::new(Dielectric::new(1.5));
+    let mat_right = Arc::new(Metal::new(Color::new(0.8, 0.6, 0.2), 0.0));
+
+    let sphere_ground = Sphere::new(Point3::new(0.0, -100.5, -1.0), 100.0, mat_ground);
+    let sphere_center = Sphere::new(Point3::new(0.0, 0.0, -1.0), 0.5, mat_center);
+    let sphere_left = Sphere::new(Point3::new(-1.0, 0.0, -1.0), 0.5, mat_left.clone());
+    let sphere_right = Sphere::new(Point3::new(1.0, 0.0, -1.0), 0.5, mat_right);
+
+    world.push(Box::new(sphere_ground));
+    world.push(Box::new(sphere_center));
+    world.push(Box::new(sphere_left));
+    world.push(Box::new(sphere_right));
+
+    return (config, world, camera);
+}
+
+#[allow(dead_code)]
+
+pub fn base_scene_without_motion() -> Scene {
+    eprintln!("Base Scene!");
+    let camera_config = CameraConfig::new(CameraConfigOptions {
+        lookfrom: Point3::new(0.0, 0.0, 0.0),
+        lookat: Point3::new(0.0, 0.0, -1.0),
+        vup: Vec3::new(0.0, 1.0, 0.0),
+        aperture: 0.0,
+        vfov: 90.0,
+        dist_to_focus: None,
+        time0: None,
+        time1: None,
     });
 
     let config = Config::new(ConfigOptions {
