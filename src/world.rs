@@ -1,4 +1,4 @@
-use crate::{aabb, HitRecord, Hitable, Ray};
+use crate::{HitRecord, Hitable, Ray, AABB};
 
 pub type World = Vec<Box<dyn Hitable>>;
 
@@ -16,11 +16,11 @@ impl Hitable for World {
 
         tmp_rec
     }
-    fn bounding_box(&self, time0: f64, time1: f64) -> Option<aabb> {
+    fn bounding_box(&self, time0: f64, time1: f64) -> Option<AABB> {
         let bbox = self.first()?.bounding_box(time0, time1)?;
         let output_box = self.into_iter().skip(1).try_fold(bbox, |acc, obj| {
             let curr_bound = obj.bounding_box(time0, time1)?;
-            Some(aabb::surrounding_box(&acc, &curr_bound))
+            Some(AABB::surrounding_box(&acc, &curr_bound))
         });
 
         output_box

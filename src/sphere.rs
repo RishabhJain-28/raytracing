@@ -1,10 +1,9 @@
 use std::sync::Arc;
 
 use crate::{
-    aabb,
     hit::{HitRecord, Hitable},
     material::Scatter,
-    vec3, Point3, Vec3,
+    Point3, Vec3, AABB,
 };
 
 pub struct Sphere {
@@ -55,9 +54,9 @@ impl Hitable for Sphere {
         rec.set_face_normal(r, outward_normal);
         Some(rec)
     }
-    fn bounding_box(&self, time0: f64, time1: f64) -> Option<aabb> {
+    fn bounding_box(&self, _: f64, _: f64) -> Option<AABB> {
         let radius_vec = Vec3::new(self.radius, self.radius, self.radius);
-        Some(aabb::new(
+        Some(AABB::new(
             self.center - radius_vec,
             self.center + radius_vec,
         ))
@@ -131,18 +130,18 @@ impl Hitable for MovingSphere {
         Some(rec)
     }
 
-    fn bounding_box(&self, time0: f64, time1: f64) -> Option<aabb> {
+    fn bounding_box(&self, time0: f64, time1: f64) -> Option<AABB> {
         let radius_vec = Vec3::new(self.radius, self.radius, self.radius);
 
-        let box0 = aabb::new(
+        let box0 = AABB::new(
             self.center(time0) - radius_vec,
             self.center(time0) + radius_vec,
         );
-        let box1 = aabb::new(
+        let box1 = AABB::new(
             self.center(time1) - radius_vec,
             self.center(time1) + radius_vec,
         );
 
-        Some(aabb::surrounding_box(&box0, &box1))
+        Some(AABB::surrounding_box(&box0, &box1))
     }
 }

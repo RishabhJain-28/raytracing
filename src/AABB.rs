@@ -1,15 +1,16 @@
-use crate::{Hitable, Point3};
+use crate::Point3;
 
-pub struct aabb {
+#[derive(Clone, Copy)]
+pub struct AABB {
     min: Point3,
     max: Point3,
 }
 
-impl aabb {
-    pub fn new(min: Point3, max: Point3) -> aabb {
-        aabb { min, max }
+impl AABB {
+    pub fn new(min: Point3, max: Point3) -> AABB {
+        AABB { min, max }
     }
-    pub fn surrounding_box(box0: &aabb, box1: &aabb) -> aabb {
+    pub fn surrounding_box(box0: &AABB, box1: &AABB) -> AABB {
         let small = Point3::new(
             box0.min().x().min(box1.min().x()),
             box0.min().y().min(box1.min().y()),
@@ -20,7 +21,7 @@ impl aabb {
             box0.max().y().max(box1.max().y()),
             box0.max().z().max(box1.max().z()),
         );
-        aabb {
+        AABB {
             min: small,
             max: big,
         }
@@ -31,7 +32,7 @@ impl aabb {
     pub fn max(&self) -> Point3 {
         return self.max;
     }
-    fn hit(&self, r: &crate::Ray, t_min: f64, t_max: f64) -> bool {
+    pub fn hit(&self, r: &crate::Ray, t_min: f64, t_max: f64) -> bool {
         for a in 0..3 {
             let inv_d = 1.0 / r.direction()[a];
             let t0 = (self.min()[a] - r.origin()[a]) * inv_d;
