@@ -1,9 +1,10 @@
 use std::sync::Arc;
 
 use crate::{
-    hit::{Hit, HitRecord},
+    aabb,
+    hit::{HitRecord, Hitable},
     material::Scatter,
-    Point3, Vec3,
+    vec3, Point3, Vec3,
 };
 
 pub struct Sphere {
@@ -22,7 +23,7 @@ impl Sphere {
     }
 }
 
-impl Hit for Sphere {
+impl Hitable for Sphere {
     fn hit(&self, r: &crate::Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
         let oc = r.origin() - self.center;
         let a = r.direction().length().powi(2);
@@ -53,6 +54,13 @@ impl Hit for Sphere {
         let outward_normal = (rec.p - self.center) / self.radius;
         rec.set_face_normal(r, outward_normal);
         Some(rec)
+    }
+    fn bounding_box(&self, time0: f64, time1: f64) -> Option<aabb> {
+        let radius_vec = Vec3::new(self.radius, self.radius, self.radius);
+        Some(aabb::new(
+            self.center - radius_vec,
+            self.center + radius_vec,
+        ))
     }
 }
 
@@ -90,7 +98,7 @@ impl MovingSphere {
     }
 }
 
-impl Hit for MovingSphere {
+impl Hitable for MovingSphere {
     fn hit(&self, r: &crate::Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
         let oc = r.origin() - self.center(r.time());
         let a = r.direction().length().powi(2);
@@ -121,5 +129,20 @@ impl Hit for MovingSphere {
         let outward_normal = (rec.p - self.center(r.time())) / self.radius;
         rec.set_face_normal(r, outward_normal);
         Some(rec)
+    }
+
+    fn bounding_box(&self, time0: f64, time1: f64) -> Option<aabb> {
+        let radius_vec = Vec3::new(self.radius, self.radius, self.radius);
+
+        let box0 = aabb::new(
+            self.center(time0) - radius_vec,
+            self.center(time0) + radius_vec,
+        );
+        let box1 = aabb::new(
+            self.center(time1) - radius_vec,
+            self.center(time1) + radius_vec,
+        );
+
+        Some(aabb::surrounding_box(&box0, &box1))
     }
 }

@@ -1,6 +1,6 @@
 use rand::Rng;
 use ray_tracing_in_one_weekend::{
-    base_scene, Camera, CameraConfig, Color, Config, Dielectric, Hit, Lambertian, Metal,
+    base_scene, Camera, CameraConfig, Color, Config, Dielectric, Hitable, Lambertian, Metal,
     MovingSphere, Point3, Ray, Scene, Sphere, Vec3, World,
 };
 use rayon::prelude::{IntoParallelIterator, ParallelIterator};

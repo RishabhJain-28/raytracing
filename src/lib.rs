@@ -1,3 +1,4 @@
+mod AABB;
 mod camera;
 mod config;
 mod hit;
@@ -16,3 +17,4 @@ pub use scenes::*;
 pub use sphere::*;
 pub use vec3::{Color, Point3, Vec3};
 pub use world::World;
+pub use AABB::*;
