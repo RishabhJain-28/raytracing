@@ -62,8 +62,8 @@ impl CameraConfig {
             vup: config.vup,
             aperture: config.aperture,
             vfov: config.vfov,
-            time0: config.time0.unwrap_or_default(),
-            time1: config.time0.unwrap_or_default(),
+            time0: config.time0.unwrap_or(0.0),
+            time1: config.time1.unwrap_or(0.0),
         }
     }
 }

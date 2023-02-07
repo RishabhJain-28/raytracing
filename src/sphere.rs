@@ -1,24 +1,33 @@
-use std::sync::Arc;
+use std::{f64::consts::PI, sync::Arc};
 
 use crate::{
     hit::{HitRecord, Hitable},
-    material::Scatter,
+    material::Material,
     Point3, Vec3, AABB,
 };
 
 pub struct Sphere {
     radius: f64,
     center: Point3,
-    mat: Arc<dyn Scatter>,
+    mat: Arc<dyn Material>,
 }
 
 impl Sphere {
-    pub fn new(center: Point3, radius: f64, mat: Arc<dyn Scatter>) -> Self {
+    pub fn new(center: Point3, radius: f64, mat: Arc<dyn Material>) -> Self {
         Self {
             radius,
             center,
             mat,
         }
+    }
+    fn get_shpere_uv(p: Point3) -> (f64, f64) {
+        let theta = (-p.y()).acos();
+        let phi = (-p.y()).atan2(p.x()) + PI;
+
+        let u = phi / 2.0 * PI;
+        let v = theta / PI;
+
+        (u, v)
     }
 }
 
@@ -48,10 +57,16 @@ impl Hitable for Sphere {
             mat: self.mat.clone(),
             normal: Vec3::new(0.0, 0.0, 0.0),
             front_face: false,
+            u: 0.0,
+            v: 0.0,
         };
-
         let outward_normal = (rec.p - self.center) / self.radius;
+        let (u, v) = Sphere::get_shpere_uv(outward_normal);
+
         rec.set_face_normal(r, outward_normal);
+        rec.u = u;
+        rec.v = v;
+
         Some(rec)
     }
     fn bounding_box(&self, _: f64, _: f64) -> Option<AABB> {
@@ -69,13 +84,13 @@ pub struct MovingSphere {
     center1: Point3,
     time0: f64,
     time1: f64,
-    mat: Arc<dyn Scatter>,
+    mat: Arc<dyn Material>,
 }
 
 impl MovingSphere {
     pub fn new(
         radius: f64,
-        mat: Arc<dyn Scatter>,
+        mat: Arc<dyn Material>,
         center0: Point3,
         center1: Point3,
         time0: f64,
@@ -94,6 +109,15 @@ impl MovingSphere {
     pub fn center(&self, time: f64) -> Point3 {
         self.center0
             + ((time - self.time0) / (self.time1 - self.time0)) * (self.center1 - self.center0)
+    }
+    fn get_shpere_uv(p: Point3) -> (f64, f64) {
+        let theta = (-p.y()).acos();
+        let phi = (-p.y()).atan2(p.x()) + PI;
+
+        let u = phi / 2.0 * PI;
+        let v = theta / PI;
+
+        (u, v)
     }
 }
 
@@ -123,10 +147,17 @@ impl Hitable for MovingSphere {
             mat: self.mat.clone(),
             normal: Vec3::new(0.0, 0.0, 0.0),
             front_face: false,
+            u: 0.0,
+            v: 0.0,
         };
 
         let outward_normal = (rec.p - self.center(r.time())) / self.radius;
+        let (u, v) = Sphere::get_shpere_uv(outward_normal);
+
         rec.set_face_normal(r, outward_normal);
+        rec.u = u;
+        rec.v = v;
+
         Some(rec)
     }
 

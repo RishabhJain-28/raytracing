@@ -1,13 +1,15 @@
 use std::sync::Arc;
 
-use crate::{material::Scatter, Point3, Ray, Vec3, AABB};
+use crate::{material::Material, Point3, Ray, Vec3, AABB};
 
 pub struct HitRecord {
     pub p: Point3,
     pub t: f64,
-    pub mat: Arc<dyn Scatter>,
+    pub mat: Arc<dyn Material>,
     pub normal: Vec3,
     pub front_face: bool,
+    pub u: f64,
+    pub v: f64,
 }
 
 impl HitRecord {

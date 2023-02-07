@@ -28,7 +28,7 @@ pub fn get_random_spheres_scene() -> Scene {
     let mut rng = rand::thread_rng();
     let mut world = World::new();
 
-    let ground_mat = Arc::new(Lambertian::new(Color::new(0.5, 0.5, 0.5)));
+    let ground_mat = Arc::new(Lambertian::new(SolidColor::from_rbg(0.5, 0.5, 0.5)));
     let ground_sphere = Sphere::new(Point3::new(0.0, -1000.0, 0.0), 1000.0, ground_mat);
 
     world.push(Box::new(ground_sphere));
@@ -45,7 +45,7 @@ pub fn get_random_spheres_scene() -> Scene {
             if choose_mat < 0.8 {
                 // Diffuse
                 let albedo = Color::random(0.0..1.0) * Color::random(0.0..1.0);
-                let sphere_mat = Arc::new(Lambertian::new(albedo));
+                let sphere_mat = Arc::new(Lambertian::new(SolidColor::new(albedo)));
                 let sphere = Sphere::new(center, 0.2, sphere_mat);
 
                 world.push(Box::new(sphere));
@@ -68,7 +68,7 @@ pub fn get_random_spheres_scene() -> Scene {
     }
 
     let mat1 = Arc::new(Dielectric::new(1.5));
-    let mat2 = Arc::new(Lambertian::new(Color::new(0.4, 0.2, 0.1)));
+    let mat2 = Arc::new(Lambertian::new(SolidColor::from_rbg(0.4, 0.2, 0.1)));
     let mat3 = Arc::new(Metal::new(Color::new(0.7, 0.6, 0.5), 0.0));
 
     let sphere1 = Sphere::new(Point3::new(0.0, 1.0, 0.0), 1.0, mat1);
@@ -109,8 +109,8 @@ pub fn base_scene() -> Scene {
     });
     let camera = Camera::new(&config.camera_config, config.aspect_ratio);
     let mut world = World::new();
-    let mat_ground = Arc::new(Lambertian::new(Color::new(0.8, 0.8, 0.0)));
-    let mat_center = Arc::new(Lambertian::new(Color::new(0.1, 0.2, 0.5)));
+    let mat_ground = Arc::new(Lambertian::new(SolidColor::from_rbg(0.8, 0.8, 0.0)));
+    let mat_center = Arc::new(Lambertian::new(SolidColor::from_rbg(0.1, 0.2, 0.5)));
     let mat_left = Arc::new(Dielectric::new(1.5));
     let mat_right = Arc::new(Metal::new(Color::new(0.8, 0.6, 0.2), 0.0));
 
@@ -151,8 +151,8 @@ pub fn base_scene_without_motion() -> Scene {
     });
     let camera = Camera::new(&config.camera_config, config.aspect_ratio);
     let mut world = World::new();
-    let mat_ground = Arc::new(Lambertian::new(Color::new(0.8, 0.8, 0.0)));
-    let mat_center = Arc::new(Lambertian::new(Color::new(0.1, 0.2, 0.5)));
+    let mat_ground = Arc::new(Lambertian::new(SolidColor::from_rbg(0.8, 0.8, 0.0)));
+    let mat_center = Arc::new(Lambertian::new(SolidColor::from_rbg(0.1, 0.2, 0.5)));
     let mat_left = Arc::new(Dielectric::new(1.5));
     let mat_right = Arc::new(Metal::new(Color::new(0.8, 0.6, 0.2), 0.0));
 
@@ -165,6 +165,55 @@ pub fn base_scene_without_motion() -> Scene {
     world.push(Box::new(sphere_center));
     world.push(Box::new(sphere_left));
     world.push(Box::new(sphere_right));
+
+    return (config, world, camera);
+}
+
+#[allow(dead_code)]
+pub fn two_checkered_spheres() -> Scene {
+    eprintln!("");
+    let camera_config = CameraConfig::new(CameraConfigOptions {
+        lookfrom: Point3::new(13.0, 2.0, 3.0),
+        lookat: Point3::new(0.0, 0.0, 0.0),
+        vup: Vec3::new(0.0, 1.0, 0.0),
+        aperture: 0.1,
+        vfov: 20.0,
+        dist_to_focus: Some(10.0),
+        time0: None,
+        time1: None,
+    });
+
+    let config = Config::new(ConfigOptions {
+        aspect_ratio: 16.0 / 9.0,
+        image_width: 400,
+        samples_per_pixel: 100,
+        max_depth: 50,
+        camera_config,
+    });
+
+    let camera = Camera::new(&config.camera_config, config.aspect_ratio);
+    let mut world = World::new();
+
+    let checkered_texture = CheckerTexture::new(
+        SolidColor::from_rbg(0.2, 0.3, 0.1),
+        SolidColor::from_rbg(0.9, 0.9, 0.9),
+    );
+
+    let checkered_material = Arc::new(Lambertian::new(checkered_texture));
+
+    let sphere1 = Sphere::new(
+        Point3::new(0.0, -10.0, 0.0),
+        10.0,
+        checkered_material.clone(),
+    );
+    let sphere2 = Sphere::new(
+        Point3::new(0.0, 10.0, 0.0),
+        10.0,
+        checkered_material.clone(),
+    );
+
+    world.push(Box::new(sphere1));
+    world.push(Box::new(sphere2));
 
     return (config, world, camera);
 }

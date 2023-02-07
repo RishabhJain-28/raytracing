@@ -1,7 +1,8 @@
 use rand::Rng;
 use ray_tracing_in_one_weekend::{
-    base_scene, Camera, CameraConfig, Color, Config, Dielectric, Hitable, Lambertian, Metal,
-    MovingSphere, Point3, Ray, Scene, Sphere, Vec3, World,
+    base_scene, get_random_spheres_scene, two_checkered_spheres, Camera, CameraConfig,
+    CheckerTexture, Color, Config, Dielectric, Hitable, Lambertian, Metal, MovingSphere, Point3,
+    Ray, Scene, SolidColor, Sphere, Vec3, World,
 };
 use rayon::prelude::{IntoParallelIterator, ParallelIterator};
 use std::sync::Arc;
@@ -66,7 +67,12 @@ fn dev_scene() -> Scene {
     let mut rng = rand::thread_rng();
     let mut world = World::new();
 
-    let ground_mat = Arc::new(Lambertian::new(Color::new(0.5, 0.5, 0.5)));
+    let checkered_texture = CheckerTexture::new(
+        SolidColor::from_rbg(0.2, 0.3, 0.1),
+        SolidColor::from_rbg(0.9, 0.9, 0.9),
+    );
+
+    let ground_mat = Arc::new(Lambertian::new(checkered_texture));
     let ground_sphere = Sphere::new(Point3::new(0.0, -1000.0, 0.0), 1000.0, ground_mat);
 
     world.push(Box::new(ground_sphere));
@@ -83,7 +89,7 @@ fn dev_scene() -> Scene {
                 if choose_mat < 0.8 {
                     // Diffuse
                     let albedo = Color::random(0.0..1.0) * Color::random(0.0..1.0);
-                    let sphere_mat = Arc::new(Lambertian::new(albedo));
+                    let sphere_mat = Arc::new(Lambertian::new(SolidColor::new(albedo)));
 
                     let center0 = center;
 
@@ -111,7 +117,7 @@ fn dev_scene() -> Scene {
     }
 
     let mat1 = Arc::new(Dielectric::new(1.5));
-    let mat2 = Arc::new(Lambertian::new(Color::new(0.4, 0.2, 0.1)));
+    let mat2 = Arc::new(Lambertian::new(SolidColor::from_rbg(0.4, 0.2, 0.1)));
     let mat3 = Arc::new(Metal::new(Color::new(0.7, 0.6, 0.5), 0.0));
 
     let sphere1 = Sphere::new(Point3::new(0.0, 1.0, 0.0), 1.0, mat1);
@@ -126,7 +132,7 @@ fn dev_scene() -> Scene {
 }
 
 fn main() {
-    let (config, world, camera) = dev_scene();
+    let (config, world, camera) = two_checkered_spheres();
 
     println!("P3");
     println!("{} {}", config.image_width, config.image_height);

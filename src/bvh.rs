@@ -1,4 +1,4 @@
-use crate::{aabb, hit, Hitable, AABB};
+use crate::{Hitable, AABB};
 use rand::Rng;
 use std::cmp::Ordering;
 
