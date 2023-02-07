@@ -29,6 +29,15 @@ impl Sphere {
 
         (u, v)
     }
+    // fn get_shpere_uv(p: Point3) -> (f64, f64) {
+    //     let theta = p.y().asin();
+    //     let phi = -p.z().atan2(p.x());
+
+    //     let u = 1.0 - (phi + PI) / 2.0 * PI;
+    //     let v = (theta + FRAC_PI_2) / PI;
+
+    //     (u, v)
+    // }
 }
 
 impl Hitable for Sphere {
@@ -110,7 +119,7 @@ impl MovingSphere {
         self.center0
             + ((time - self.time0) / (self.time1 - self.time0)) * (self.center1 - self.center0)
     }
-    fn get_shpere_uv(p: Point3) -> (f64, f64) {
+    fn get_sphere_uv(p: Point3) -> (f64, f64) {
         let theta = (-p.y()).acos();
         let phi = (-p.y()).atan2(p.x()) + PI;
 

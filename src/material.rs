@@ -24,7 +24,7 @@ impl<T: Texture> Material for Lambertian<T> {
 
         let scattered = Ray::new(rec.p, scatter_direction, r_in.time());
 
-        Some((self.albedo.value(rec.u, rec.v, &rec.p), scattered))
+        Some((self.albedo.value(rec.u, rec.v, rec.p), scattered))
     }
 }
 

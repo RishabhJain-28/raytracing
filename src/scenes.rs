@@ -217,3 +217,44 @@ pub fn two_checkered_spheres() -> Scene {
 
     return (config, world, camera);
 }
+
+#[allow(dead_code)]
+pub fn two_perlin_spheres() -> Scene {
+    let camera_config = CameraConfig::new(CameraConfigOptions {
+        lookfrom: Point3::new(13.0, 2.0, 3.0),
+        lookat: Point3::new(0.0, 0.0, 0.0),
+        vup: Vec3::new(0.0, 1.0, 0.0),
+        aperture: 0.1,
+        vfov: 20.0,
+        dist_to_focus: None,
+        time0: None,
+        time1: None,
+    });
+
+    let config = Config::new(ConfigOptions {
+        aspect_ratio: 16.0 / 9.0,
+        image_width: 400,
+        samples_per_pixel: 100,
+        max_depth: 50,
+        camera_config,
+    });
+
+    let mut world = World::new();
+    let mat = Arc::new(Lambertian::new(NoiseTexture::new(4.0)));
+    // let mat = Arc::new(Lambertian::new(CheckerTexture::new(
+    //     SolidColor::from_rbg(0.5, 0.5, 0.5),
+    //     SolidColor::from_rbg(0.2, 0.2, 0.2),
+    // )));
+    let sphere = Box::new(Sphere::new(
+        Point3::new(0.0, -1000.0, 0.0),
+        1000.0,
+        mat.clone(),
+    ));
+    let sphere2 = Box::new(Sphere::new(Point3::new(0.0, 2.0, 0.0), 2.0, mat));
+    world.push(sphere);
+    world.push(sphere2);
+
+    let camera = Camera::new(&config.camera_config, config.aspect_ratio);
+
+    (config, world, camera)
+}
