@@ -12,7 +12,7 @@ pub struct Perlin {
 impl Perlin {
     const POINT_COUNT: usize = 256;
 
-    fn permute(p: &mut [usize], n: usize) {
+    fn permute(p: &mut [usize]) {
         let mut rng = rand::thread_rng();
         for i in (0..(p.len() - 1)).rev() {
             let target = rng.gen_range(0..=i);
@@ -22,23 +22,23 @@ impl Perlin {
 
     fn perlin_generate_perm() -> Vec<usize> {
         let mut p: Vec<usize> = (0..Self::POINT_COUNT).collect();
-        Self::permute(&mut p, Self::POINT_COUNT);
+        Self::permute(&mut p);
         p
     }
-    fn trilinear_intp(c: [[[f64; 2]; 2]; 2], u: f64, v: f64, w: f64) -> f64 {
-        let mut acc = 0.0;
-        for i in 0..2 {
-            for j in 0..2 {
-                for k in 0..2 {
-                    acc += (i as f64 * u + (1 - i) as f64 * (1.0 - u))
-                        * (j as f64 * v + (1 - j) as f64 * (1.0 - v))
-                        * (k as f64 * w + (1 - k) as f64 * (1.0 - w))
-                        * c[i][j][k];
-                }
-            }
-        }
-        acc
-    }
+    // fn trilinear_intp(c: [[[f64; 2]; 2]; 2], u: f64, v: f64, w: f64) -> f64 {
+    //     let mut acc = 0.0;
+    //     for i in 0..2 {
+    //         for j in 0..2 {
+    //             for k in 0..2 {
+    //                 acc += (i as f64 * u + (1 - i) as f64 * (1.0 - u))
+    //                     * (j as f64 * v + (1 - j) as f64 * (1.0 - v))
+    //                     * (k as f64 * w + (1 - k) as f64 * (1.0 - w))
+    //                     * c[i][j][k];
+    //             }
+    //         }
+    //     }
+    //     acc
+    // }
     fn perlin_interp(c: [[[Vec3; 2]; 2]; 2], u: f64, v: f64, w: f64) -> f64 {
         let uu = u * u * (3.0 - 2.0 * u);
         let vv = v * v * (3.0 - 2.0 * v);
@@ -60,7 +60,6 @@ impl Perlin {
 
     pub fn new() -> Self {
         let mut rand_float = Vec::with_capacity(Self::POINT_COUNT);
-        let mut rng = rand::thread_rng();
         for _ in 0..Self::POINT_COUNT {
             rand_float.push(Vec3::random(-1.0..1.0).normalized());
         }
@@ -99,9 +98,9 @@ impl Perlin {
         let mut accum = 0.0;
         let mut temp_p = point;
         let mut weight = 1.0;
-        for i in 0..depth {
+        for _ in 0..depth {
             accum += weight * Self::noise(&self, &temp_p);
-            weight *= 0.25;
+            weight *= 0.5;
             temp_p *= 2.0;
         }
         accum.abs()
