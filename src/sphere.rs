@@ -1,4 +1,7 @@
-use std::{f64::consts::PI, sync::Arc};
+use std::{
+    f64::consts::{FRAC_PI_2, PI},
+    sync::Arc,
+};
 
 use crate::{
     hit::{HitRecord, Hitable},
@@ -22,18 +25,18 @@ impl Sphere {
     }
     fn get_shpere_uv(p: Point3) -> (f64, f64) {
         let theta = (-p.y()).acos();
-        let phi = (-p.y()).atan2(p.x()) + PI;
+        let phi = (-p.z()).atan2(p.x()) + PI;
 
-        let u = phi / 2.0 * PI;
+        let u = phi / (2.0 * PI);
         let v = theta / PI;
 
         (u, v)
     }
     // fn get_shpere_uv(p: Point3) -> (f64, f64) {
     //     let theta = p.y().asin();
-    //     let phi = -p.z().atan2(p.x());
+    //     let phi = p.z().atan2(p.x());
 
-    //     let u = 1.0 - (phi + PI) / 2.0 * PI;
+    //     let u = 1.0 - (phi + PI) / (2.0 * PI);
     //     let v = (theta + FRAC_PI_2) / PI;
 
     //     (u, v)

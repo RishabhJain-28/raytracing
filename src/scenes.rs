@@ -258,3 +258,38 @@ pub fn two_perlin_spheres() -> Scene {
 
     (config, world, camera)
 }
+#[allow(dead_code)]
+pub fn earth_map_sphere() -> Scene {
+    let camera_config = CameraConfig::new(CameraConfigOptions {
+        lookfrom: Point3::new(13.0, 2.0, 3.0),
+        lookat: Point3::new(0.0, 0.0, 0.0),
+        vup: Vec3::new(0.0, 1.0, 0.0),
+        aperture: 0.1,
+        vfov: 20.0,
+        dist_to_focus: None,
+        time0: None,
+        time1: None,
+    });
+
+    let config = Config::new(ConfigOptions {
+        aspect_ratio: 16.0 / 9.0,
+        image_width: 400,
+        samples_per_pixel: 100,
+        max_depth: 50,
+        camera_config,
+    });
+
+    let mut world = World::new();
+    let texture = ImageTexture::from_file("earthmap.jpg");
+    let earth_surface = Arc::new(Lambertian::new(texture));
+    let sphere = Box::new(Sphere::new(
+        Point3::new(0.0, 0.0, 0.0),
+        2.0,
+        earth_surface.clone(),
+    ));
+    world.push(sphere);
+
+    let camera = Camera::new(&config.camera_config, config.aspect_ratio);
+
+    (config, world, camera)
+}
