@@ -23,6 +23,7 @@ pub fn get_random_spheres_scene() -> Scene {
         samples_per_pixel: 500,
         max_depth: 50,
         camera_config,
+        background_color: None,
     });
 
     let mut rng = rand::thread_rng();
@@ -105,6 +106,7 @@ pub fn base_scene() -> Scene {
         image_width: 256,
         samples_per_pixel: 100,
         max_depth: 5,
+        background_color: None,
         camera_config,
     });
     let camera = Camera::new(&config.camera_config, config.aspect_ratio);
@@ -146,6 +148,7 @@ pub fn base_scene_without_motion() -> Scene {
         aspect_ratio: 16.0 / 9.0,
         image_width: 256,
         samples_per_pixel: 100,
+        background_color: None,
         max_depth: 5,
         camera_config,
     });
@@ -189,6 +192,7 @@ pub fn two_checkered_spheres() -> Scene {
         samples_per_pixel: 100,
         max_depth: 50,
         camera_config,
+        background_color: None,
     });
 
     let camera = Camera::new(&config.camera_config, config.aspect_ratio);
@@ -236,6 +240,7 @@ pub fn two_perlin_spheres() -> Scene {
         image_width: 400,
         samples_per_pixel: 100,
         max_depth: 50,
+        background_color: None,
         camera_config,
     });
 
@@ -259,6 +264,63 @@ pub fn two_perlin_spheres() -> Scene {
     (config, world, camera)
 }
 #[allow(dead_code)]
+pub fn rect_light() -> Scene {
+    let camera_config = CameraConfig::new(CameraConfigOptions {
+        lookfrom: Point3::new(26.0, 3.0, 6.0),
+        lookat: Point3::new(0.0, 2.0, 0.0),
+        vup: Vec3::new(0.0, 1.0, 0.0),
+        aperture: 0.1,
+        vfov: 20.0,
+        dist_to_focus: None,
+        time0: None,
+        time1: None,
+    });
+
+    let config = Config::new(ConfigOptions {
+        aspect_ratio: 16.0 / 9.0,
+        background_color: Some(Color::new(0.0, 0.0, 0.0)),
+        image_width: 400,
+        samples_per_pixel: 400,
+        max_depth: 50,
+        camera_config,
+    });
+
+    let mut world = World::new();
+
+    let mat = Arc::new(Lambertian::new(SolidColor::from_rbg(0.0, 0.0, 0.7)));
+    let ground_mat = Arc::new(Lambertian::new(SolidColor::from_rbg(0.7, 0.0, 0.0)));
+    let diff_light = Arc::new(DiffuseLight::from_color(Color::new(4.0, 4.0, 4.0)));
+
+    let ground = Box::new(Sphere::new(
+        Point3::new(0.0, -1000.0, 0.0),
+        1000.0,
+        ground_mat.clone(),
+    ));
+    let obj_sphere = Box::new(Sphere::new(Point3::new(0.0, 2.0, 0.0), 2.0, mat.clone()));
+    let light_rect = Box::new(Plane::new(
+        PlaneOrientation::XY,
+        diff_light.clone(),
+        0.0,
+        4.0,
+        0.0,
+        4.0,
+        -2.0,
+    ));
+    let light_sphere = Box::new(Sphere::new(
+        Point3::new(0.0, 7.0, 0.0),
+        2.0,
+        diff_light.clone(),
+    ));
+    world.push(obj_sphere);
+    world.push(ground);
+    world.push(light_rect);
+    world.push(light_sphere);
+
+    let camera = Camera::new(&config.camera_config, config.aspect_ratio);
+
+    (config, world, camera)
+}
+#[allow(dead_code)]
 pub fn earth_map_sphere() -> Scene {
     let camera_config = CameraConfig::new(CameraConfigOptions {
         lookfrom: Point3::new(13.0, 2.0, 3.0),
@@ -273,6 +335,7 @@ pub fn earth_map_sphere() -> Scene {
 
     let config = Config::new(ConfigOptions {
         aspect_ratio: 16.0 / 9.0,
+        background_color: None,
         image_width: 400,
         samples_per_pixel: 100,
         max_depth: 50,
@@ -288,6 +351,95 @@ pub fn earth_map_sphere() -> Scene {
         earth_surface.clone(),
     ));
     world.push(sphere);
+
+    let camera = Camera::new(&config.camera_config, config.aspect_ratio);
+
+    (config, world, camera)
+}
+
+#[allow(dead_code)]
+pub fn cornell_box() -> Scene {
+    let camera_config = CameraConfig::new(CameraConfigOptions {
+        lookfrom: Point3::new(278.0, 278.0, -800.0),
+        lookat: Point3::new(278.0, 278.0, 0.0),
+        vup: Vec3::new(0.0, 1.0, 0.0),
+        aperture: 0.1,
+        vfov: 40.0,
+        dist_to_focus: None,
+        time0: None,
+        time1: None,
+    });
+
+    let config = Config::new(ConfigOptions {
+        aspect_ratio: 1.0,
+        background_color: Some(Color::new(0.0, 0.0, 0.0)),
+        image_width: 600,
+        samples_per_pixel: 400,
+        max_depth: 50,
+        camera_config,
+    });
+
+    let mut world = World::new();
+
+    let red = Arc::new(Lambertian::new(SolidColor::from_rbg(0.65, 0.05, 0.05)));
+    let white = Arc::new(Lambertian::new(SolidColor::from_rbg(0.73, 0.73, 0.73)));
+    let green = Arc::new(Lambertian::new(SolidColor::from_rbg(0.12, 0.45, 0.12)));
+    let light = Arc::new(DiffuseLight::from_color(Color::new(15.0, 15.0, 15.0)));
+
+    world.push(Box::new(Plane::new(
+        PlaneOrientation::YZ,
+        green,
+        0.0,
+        555.0,
+        0.0,
+        555.0,
+        555.0,
+    )));
+    world.push(Box::new(Plane::new(
+        PlaneOrientation::YZ,
+        red,
+        0.0,
+        555.0,
+        0.0,
+        555.0,
+        0.0,
+    )));
+    world.push(Box::new(Plane::new(
+        PlaneOrientation::ZX,
+        light.clone(),
+        213.0,
+        343.0,
+        227.0,
+        332.0,
+        554.0,
+    )));
+    world.push(Box::new(Plane::new(
+        PlaneOrientation::ZX,
+        white.clone(),
+        0.0,
+        555.0,
+        0.0,
+        555.0,
+        0.0,
+    )));
+    world.push(Box::new(Plane::new(
+        PlaneOrientation::ZX,
+        white.clone(),
+        0.0,
+        555.0,
+        0.0,
+        555.0,
+        555.0,
+    )));
+    world.push(Box::new(Plane::new(
+        PlaneOrientation::XY,
+        white.clone(),
+        0.0,
+        555.0,
+        0.0,
+        555.0,
+        555.0,
+    )));
 
     let camera = Camera::new(&config.camera_config, config.aspect_ratio);
 

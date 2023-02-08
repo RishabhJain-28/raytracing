@@ -1,27 +1,29 @@
 use rand::Rng;
 use ray_tracing_in_one_weekend::{
-    base_scene, earth_map_sphere, two_perlin_spheres, Camera, CameraConfig, CheckerTexture, Color,
-    Config, Dielectric, Hitable, Lambertian, Metal, MovingSphere, Point3, Ray, Scene, SolidColor,
-    Sphere, Vec3, World,
+    base_scene, cornell_box, earth_map_sphere, rect_light, two_perlin_spheres, Camera,
+    CameraConfig, CheckerTexture, Color, Config, Dielectric, Hitable, Lambertian, Metal,
+    MovingSphere, Point3, Ray, Scene, SolidColor, Sphere, Vec3, World,
 };
 use rayon::prelude::{IntoParallelIterator, ParallelIterator};
 use std::sync::Arc;
 
-fn ray_color(r: &Ray, world: &World, depth: u64) -> Color {
+fn ray_color(r: &Ray, world: &World, backgorund_color: Color, depth: u64) -> Color {
     if depth <= 0 {
         return Color::new(0.0, 0.0, 0.0);
     }
 
     if let Some(rec) = world.hit(r, 0.001, f64::INFINITY) {
+        let emitted = rec.mat.emitted(rec.u, rec.v, rec.p);
         if let Some((attenuation, scattered)) = rec.mat.scatter(r, &rec) {
-            attenuation * ray_color(&scattered, world, depth - 1)
+            emitted + attenuation * ray_color(&scattered, world, backgorund_color, depth - 1)
         } else {
-            Color::new(0.0, 0.0, 0.0)
+            emitted
         }
     } else {
-        let unit_direction = r.direction().normalized();
-        let t = 0.5 * (unit_direction.y() + 1.0);
-        (1.0 - t) * Color::new(1.0, 1.0, 1.0) + t * Color::new(0.5, 0.7, 1.0)
+        return backgorund_color;
+        // let unit_direction = r.direction().normalized();
+        // let t = 0.5 * (unit_direction.y() + 1.0);
+        // (1.0 - t) * Color::new(1.0, 1.0, 1.0) + t * Color::new(0.5, 0.7, 1.0)
     }
 }
 
@@ -29,8 +31,8 @@ fn generate_dev_config() -> Config {
     const ASPECT_RATIO: f64 = 16.0 / 9.0;
     const IMAGE_WIDTH: u64 = 400;
     const IMAGE_HEIGHT: u64 = ((IMAGE_WIDTH as f64) / ASPECT_RATIO) as u64;
-    const SAMPLES_PER_PIXEL: u64 = 100;
-    const MAX_DEPTH: u64 = 50;
+    const SAMPLES_PER_PIXEL: u64 = 50;
+    const MAX_DEPTH: u64 = 10;
 
     let lookfrom = Point3::new(13.0, 2.0, 3.0);
     let lookat = Point3::new(0.0, 0.0, 0.0);
@@ -55,6 +57,8 @@ fn generate_dev_config() -> Config {
             time0: 0.0,
             time1: 1.0,
         },
+        background_color: Color::new(0.0, 0.0, 0.0),
+        // background_color: Color::new(0.70, 0.80, 1.00),
     }
 }
 
@@ -77,8 +81,8 @@ fn dev_scene() -> Scene {
 
     world.push(Box::new(ground_sphere));
 
-    for a in -11..=11 {
-        for b in -11..=11 {
+    for a in -4..=4 {
+        for b in -4..=4 {
             let choose_mat: f64 = rng.gen();
             let center = Point3::new(
                 (a as f64) + rng.gen_range(0.0..0.9),
@@ -132,7 +136,7 @@ fn dev_scene() -> Scene {
 }
 
 fn main() {
-    let (config, world, camera) = earth_map_sphere();
+    let (config, world, camera) = cornell_box();
     // let (config, world, camera) = two_perlin_spheres();
 
     println!("P3");
@@ -154,7 +158,7 @@ fn main() {
                     let v = ((j as f64) + random_v) / ((config.image_height - 1) as f64);
 
                     let r = camera.get_ray(u, v);
-                    pixel_color += ray_color(&r, &world, config.max_depth);
+                    pixel_color += ray_color(&r, &world, config.background_color, config.max_depth);
                 }
 
                 pixel_color
@@ -189,7 +193,7 @@ fn main_seq_executor() {
                 let v = ((j as f64) + random_v) / ((config.image_height - 1) as f64);
 
                 let r = camera.get_ray(u, v);
-                pixel_color += ray_color(&r, &world, config.max_depth);
+                pixel_color += ray_color(&r, &world, config.background_color, config.max_depth);
             }
 
             println!("{}", pixel_color.format_color(config.samples_per_pixel));

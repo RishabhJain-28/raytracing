@@ -1,9 +1,12 @@
 use rand::Rng;
 
-use crate::{Color, HitRecord, Ray, Texture, Vec3};
+use crate::{Color, HitRecord, Point3, Ray, SolidColor, Texture, Vec3};
 
 pub trait Material: Send + Sync {
     fn scatter(&self, r_in: &Ray, rec: &HitRecord) -> Option<(Color, Ray)>;
+    fn emitted(&self, _u: f64, _v: f64, _point: Point3) -> Color {
+        Color::new(0.0, 0.0, 0.0)
+    }
 }
 pub struct Lambertian<T: Texture> {
     albedo: T,
@@ -99,5 +102,32 @@ impl Material for Dielectric {
         let scattered = Ray::new(rec.p, direction, r_in.time());
 
         Some((Color::new(1.0, 1.0, 1.0), scattered))
+    }
+}
+
+pub struct DiffuseLight<T: Texture> {
+    emit: T,
+}
+
+impl<T: Texture> DiffuseLight<T> {
+    pub fn new(emit: T) -> Self {
+        Self { emit }
+    }
+}
+
+impl DiffuseLight<SolidColor> {
+    pub fn from_color(color: Color) -> Self {
+        Self {
+            emit: SolidColor::new(color),
+        }
+    }
+}
+
+impl<T: Texture> Material for DiffuseLight<T> {
+    fn scatter(&self, _: &Ray, _: &HitRecord) -> Option<(Color, Ray)> {
+        None
+    }
+    fn emitted(&self, u: f64, v: f64, point: Point3) -> Color {
+        self.emit.value(u, v, point)
     }
 }

@@ -1,4 +1,4 @@
-use crate::{Point3, Vec3};
+use crate::{Color, Point3, Vec3};
 
 pub struct ConfigOptions {
     pub aspect_ratio: f64,
@@ -6,6 +6,7 @@ pub struct ConfigOptions {
     pub samples_per_pixel: u64,
     pub max_depth: u64,
     pub camera_config: CameraConfig,
+    pub background_color: Option<Color>,
 }
 
 pub struct Config {
@@ -15,6 +16,7 @@ pub struct Config {
     pub samples_per_pixel: u64,
     pub max_depth: u64,
     pub camera_config: CameraConfig,
+    pub background_color: Color,
 }
 
 impl Config {
@@ -26,6 +28,9 @@ impl Config {
             samples_per_pixel: options.samples_per_pixel,
             max_depth: options.max_depth,
             camera_config: options.camera_config,
+            background_color: options
+                .background_color
+                .unwrap_or(Color::new(0.70, 0.80, 1.00)),
         }
     }
 }
