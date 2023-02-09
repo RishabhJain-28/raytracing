@@ -358,7 +358,7 @@ pub fn earth_map_sphere() -> Scene {
 }
 
 #[allow(dead_code)]
-pub fn cornell_box() -> Scene {
+pub fn cornell_box_without_boxes() -> Scene {
     let camera_config = CameraConfig::new(CameraConfigOptions {
         lookfrom: Point3::new(278.0, 278.0, -800.0),
         lookat: Point3::new(278.0, 278.0, 0.0),
@@ -439,6 +439,106 @@ pub fn cornell_box() -> Scene {
         0.0,
         555.0,
         555.0,
+    )));
+
+    let camera = Camera::new(&config.camera_config, config.aspect_ratio);
+
+    (config, world, camera)
+}
+
+#[allow(dead_code)]
+pub fn cornell_box_scene() -> Scene {
+    let camera_config = CameraConfig::new(CameraConfigOptions {
+        lookfrom: Point3::new(278.0, 278.0, -800.0),
+        lookat: Point3::new(278.0, 278.0, 0.0),
+        vup: Vec3::new(0.0, 1.0, 0.0),
+        aperture: 0.1,
+        vfov: 40.0,
+        dist_to_focus: None,
+        time0: None,
+        time1: None,
+    });
+
+    let config = Config::new(ConfigOptions {
+        aspect_ratio: 1.0,
+        background_color: Some(Color::new(0.0, 0.0, 0.0)),
+        image_width: 600,
+        samples_per_pixel: 400,
+        max_depth: 50,
+        camera_config,
+    });
+
+    let mut world = World::new();
+
+    let red = Arc::new(Lambertian::new(SolidColor::from_rbg(0.65, 0.05, 0.05)));
+    let white = Arc::new(Lambertian::new(SolidColor::from_rbg(0.73, 0.73, 0.73)));
+    let green = Arc::new(Lambertian::new(SolidColor::from_rbg(0.12, 0.45, 0.12)));
+    let light = Arc::new(DiffuseLight::from_color(Color::new(15.0, 15.0, 15.0)));
+
+    world.push(Box::new(Plane::new(
+        PlaneOrientation::YZ,
+        green,
+        0.0,
+        555.0,
+        0.0,
+        555.0,
+        555.0,
+    )));
+    world.push(Box::new(Plane::new(
+        PlaneOrientation::YZ,
+        red,
+        0.0,
+        555.0,
+        0.0,
+        555.0,
+        0.0,
+    )));
+    world.push(Box::new(Plane::new(
+        PlaneOrientation::ZX,
+        light.clone(),
+        213.0,
+        343.0,
+        227.0,
+        332.0,
+        554.0,
+    )));
+    world.push(Box::new(Plane::new(
+        PlaneOrientation::ZX,
+        white.clone(),
+        0.0,
+        555.0,
+        0.0,
+        555.0,
+        0.0,
+    )));
+    world.push(Box::new(Plane::new(
+        PlaneOrientation::ZX,
+        white.clone(),
+        0.0,
+        555.0,
+        0.0,
+        555.0,
+        555.0,
+    )));
+    world.push(Box::new(Plane::new(
+        PlaneOrientation::XY,
+        white.clone(),
+        0.0,
+        555.0,
+        0.0,
+        555.0,
+        555.0,
+    )));
+
+    world.push(Box::new(Cube::new(
+        Point3::new(130.0, 0.0, 65.0),
+        Point3::new(295.0, 165.0, 230.0),
+        white.clone(),
+    )));
+    world.push(Box::new(Cube::new(
+        Point3::new(265.0, 0.0, 295.0),
+        Point3::new(430.0, 330.0, 460.0),
+        white.clone(),
     )));
 
     let camera = Camera::new(&config.camera_config, config.aspect_ratio);

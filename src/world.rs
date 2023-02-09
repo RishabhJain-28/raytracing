@@ -1,6 +1,7 @@
 use crate::{HitRecord, Hitable, Ray, AABB};
 
 pub type World = Vec<Box<dyn Hitable>>;
+pub type HittableList = World;
 
 impl Hitable for World {
     fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
