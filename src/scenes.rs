@@ -530,16 +530,28 @@ pub fn cornell_box_scene() -> Scene {
         555.0,
     )));
 
-    world.push(Box::new(Cube::new(
-        Point3::new(130.0, 0.0, 65.0),
-        Point3::new(295.0, 165.0, 230.0),
+    let box1 = Box::new(Cube::new(
+        Point3::new(0.0, 0.0, 0.0),
+        Point3::new(165.0, 330.0, 165.0),
         white.clone(),
-    )));
-    world.push(Box::new(Cube::new(
-        Point3::new(265.0, 0.0, 295.0),
-        Point3::new(430.0, 330.0, 460.0),
+    ));
+    // let box1 = Box::new(Cube::new(
+    //     Point3::new(130.0, 0.0, 65.0),
+    //     Point3::new(295.0, 165.0, 230.0),
+    //     white.clone(),
+    // ));
+    let box1 = RotateY::new(box1, 15.0);
+    let box1 = Translate::new(Box::new(box1), Vec3::new(265.0, 0.0, 295.0));
+    world.push(Box::new(box1));
+
+    let box2 = Box::new(Cube::new(
+        Point3::new(0.0, 0.0, 0.0),
+        Point3::new(165.0, 165.0, 165.0),
         white.clone(),
-    )));
+    ));
+    let box2 = RotateY::new(box2, -18.0);
+    let box2 = Translate::new(Box::new(box2), Vec3::new(130.0, 0.0, 65.0));
+    world.push(Box::new(box2));
 
     let camera = Camera::new(&config.camera_config, config.aspect_ratio);
 
