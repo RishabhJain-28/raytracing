@@ -1,7 +1,8 @@
 use rand::Rng;
 use ray_tracing_in_one_weekend::{
-    base_scene, cornell_box_scene, Camera, CameraConfig, CheckerTexture, Color, Config, Dielectric,
-    Hitable, Lambertian, Metal, MovingSphere, Point3, Ray, Scene, SolidColor, Sphere, Vec3, World,
+    base_scene, cornell_box_scene, cornell_box_scene_with_smoke_boxes, ray_tracing_the_next_week,
+    Camera, CameraConfig, CheckerTexture, Color, Config, Dielectric, Hitable, Lambertian, Metal,
+    MovingSphere, Point3, Ray, Scene, SolidColor, Sphere, Vec3, World,
 };
 use rayon::prelude::{IntoParallelIterator, ParallelIterator};
 use std::sync::Arc;
@@ -135,7 +136,7 @@ fn dev_scene() -> Scene {
 }
 
 fn main() {
-    let (config, world, camera) = cornell_box_scene();
+    let (config, world, camera) = ray_tracing_the_next_week();
     // let (config, world, camera) = two_perlin_spheres();
 
     println!("P3");

@@ -20,4 +20,5 @@ You can render them by calling the appropriate function in main.
 - Added rayon for parallel execution
 
 Todo : add jpeg write
-add default skyubox in case of no bg color
+add default skybox in case of no bg color
+make rotateY generic or sdd rotateX,Z

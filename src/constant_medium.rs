@@ -2,7 +2,7 @@ use std::{f64::INFINITY, sync::Arc};
 
 use rand::Rng;
 
-use crate::{Color, HitRecord, Hitable, Isotropic, Material, SolidColor, Texture, Vec3};
+use crate::{Color, HitRecord, Hitable, Isotropic, SolidColor, Texture, Vec3};
 
 pub struct ConstantMedium<T: Texture> {
     boundary: Box<dyn Hitable>,

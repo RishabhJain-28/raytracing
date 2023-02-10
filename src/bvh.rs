@@ -10,7 +10,7 @@ enum BVHNode {
     Leaf(Box<dyn Hitable>),
 }
 
-struct BVH {
+pub struct BVH {
     tree: BVHNode,
     bbox: AABB,
 }
@@ -33,7 +33,8 @@ fn box_compare(
 }
 // axis ranges to get best BVH
 impl BVH {
-    fn new(mut hitables: Vec<Box<dyn Hitable>>, time0: f64, time1: f64) -> Self {
+    pub fn new(mut hitables: Vec<Box<dyn Hitable>>, time0: f64, time1: f64) -> Self {
+        eprintln!("{}", hitables.len());
         match hitables.len() {
             0 => panic!("[BHV::new] No objects in the scene"),
             1 => {
@@ -54,8 +55,12 @@ impl BVH {
                 hitables.sort_unstable_by(box_compare(time0, time1, axis));
 
                 let mid = hitables.len() / 2;
-                let left = BVH::new(hitables.drain(0..mid).collect(), time0, time1);
+                // if mid != 0 {
+                // let left = BVH::new(hitables.drain(0..mid).collect(), time0, time1);
+                // let right = BVH::new(hitables.drain(mid..hitables.len()).collect(), time0, time1);
                 let right = BVH::new(hitables.drain(mid..).collect(), time0, time1);
+                let left = BVH::new(hitables, time0, time1);
+                // }
 
                 let left_bbox = left
                     .bounding_box(time0, time1)
