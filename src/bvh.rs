@@ -34,7 +34,7 @@ fn box_compare(
 // axis ranges to get best BVH
 impl BVH {
     pub fn new(mut hitables: Vec<Box<dyn Hitable>>, time0: f64, time1: f64) -> Self {
-        eprintln!("{}", hitables.len());
+        // eprintln!("{}", hitables.len());
         match hitables.len() {
             0 => panic!("[BHV::new] No objects in the scene"),
             1 => {

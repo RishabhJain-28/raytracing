@@ -684,46 +684,46 @@ pub fn ray_tracing_the_next_week() -> Scene {
     let config = Config::new(ConfigOptions {
         aspect_ratio: 1.0,
         background_color: Some(Color::new(0.0, 0.0, 0.0)),
-        image_width: 800,
-        samples_per_pixel: 100,
+        image_width: 600,
+        samples_per_pixel: 10000,
         max_depth: 50,
         camera_config,
     });
 
     let mut world = World::new();
 
-    let ground_mat = Arc::new(Lambertian::new(SolidColor::from_rbg(0.48, 0.83, 0.53)));
-    let boxes_per_side = 20;
-    let mut rng = rand::thread_rng();
+    // let ground_mat = Arc::new(Lambertian::new(SolidColor::from_rbg(0.48, 0.83, 0.53)));
+    // let boxes_per_side = 20;
+    // let mut rng = rand::thread_rng();
 
-    let mut boxes: HittableList = Vec::new();
+    // let mut boxes: HittableList = Vec::new();
 
-    for i in 0..boxes_per_side {
-        for j in 0..boxes_per_side {
-            let w = 100.0;
-            let x0 = -1000.0 + (i as f64) * w;
-            let z0 = -1000.0 + (j as f64) * w;
-            let y0 = 0.0;
-            let x1 = x0 + w;
-            let y1 = rng.gen_range(1.0..101.0);
-            let z1 = z0 + w;
-            boxes.push(Box::new(Cube::new(
-                Point3::new(x0, y0, z0),
-                Point3::new(x1, y1, z1),
-                ground_mat.clone(),
-            )))
-        }
-    }
-    world.push(Box::new(BVH::new(boxes, 0.0, 1.0)));
+    // for i in 0..boxes_per_side {
+    //     for j in 0..boxes_per_side {
+    //         let w = 100.0;
+    //         let x0 = -1000.0 + (i as f64) * w;
+    //         let z0 = -1000.0 + (j as f64) * w;
+    //         let y0 = 0.0;
+    //         let x1 = x0 + w;
+    //         let y1 = rng.gen_range(1.0..101.0);
+    //         let z1 = z0 + w;
+    //         boxes.push(Box::new(Cube::new(
+    //             Point3::new(x0, y0, z0),
+    //             Point3::new(x1, y1, z1),
+    //             ground_mat.clone(),
+    //         )))
+    //     }
+    // }
+    // world.push(Box::new(BVH::new(boxes, 0.0, 1.0)));
 
     let light_mat = Arc::new(DiffuseLight::from_color(Color::new(7.0, 7.0, 7.0)));
     world.push(Box::new(Plane::new(
         PlaneOrientation::ZX,
         light_mat,
-        123.,
-        423.,
         147.,
         412.,
+        123.,
+        423.,
         554.,
     )));
     let center1 = Point3::new(400., 400., 200.);
@@ -786,28 +786,28 @@ pub fn ray_tracing_the_next_week() -> Scene {
         earth_surface,
     )));
 
-    let perlin = Arc::new(Lambertian::new(NoiseTexture::new(0.1)));
-    world.push(Box::new(Sphere::new(
-        Point3::new(220., 280., 300.),
-        80.0,
-        perlin,
-    )));
+    // let perlin = Arc::new(Lambertian::new(NoiseTexture::new(0.1)));
+    // world.push(Box::new(Sphere::new(
+    //     Point3::new(220., 280., 300.),
+    //     80.0,
+    //     perlin,
+    // )));
 
-    let mut boxes: HittableList = Vec::new();
-    let white = Arc::new(Lambertian::new(SolidColor::from_rbg(0.73, 0.73, 0.73)));
-    let ns = 1000;
-    for _ in 0..ns {
-        boxes.push(Box::new(Sphere::new(
-            Point3::random(0.0..165.0),
-            10.0,
-            white.clone(),
-        )))
-    }
+    // let mut boxes: HittableList = Vec::new();
+    // let white = Arc::new(Lambertian::new(SolidColor::from_rbg(0.73, 0.73, 0.73)));
+    // let ns = 1000;
+    // for _ in 0..ns {
+    //     boxes.push(Box::new(Sphere::new(
+    //         Point3::random(0.0..165.0),
+    //         10.0,
+    //         white.clone(),
+    //     )))
+    // }
 
-    let boxes_r = RotateY::new(Box::new(BVH::new(boxes, 0.0, 1.0)), 15.0);
-    let boxes_t = Translate::new(Box::new(boxes_r), Vec3::new(-100., 270., 395.));
+    // let boxes_r = RotateY::new(Box::new(BVH::new(boxes, 0.0, 1.0)), 15.0);
+    // let boxes_t = Translate::new(Box::new(boxes_r), Vec3::new(-100., 270., 395.));
 
-    world.push(Box::new(boxes_t));
+    // world.push(Box::new(boxes_t));
 
     let camera = Camera::new(&config.camera_config, config.aspect_ratio);
 
